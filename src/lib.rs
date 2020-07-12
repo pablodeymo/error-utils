@@ -1,9 +1,4 @@
 pub mod errormessage;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
+#[cfg(feature = "enableactix")]
+pub mod msghttp;

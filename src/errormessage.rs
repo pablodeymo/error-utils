@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ErrorMessage {
@@ -16,10 +17,14 @@ impl ErrorMessage {
             },
         }
     }
+}
 
-    pub fn from_str(msg: &str) -> ErrorMessage {
-        ErrorMessage {
+impl FromStr for ErrorMessage {
+    type Err = String;
+
+    fn from_str(msg: &str) -> Result<Self, Self::Err> {
+        Ok(ErrorMessage {
             message: String::from(msg),
-        }
+        })
     }
 }
