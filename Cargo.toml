@@ -1,14 +1,14 @@
 [package]
 name = "error-utils"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Pablo Deymonnaz <deymonnaz@gmail.com>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = { version="4.0.0-beta.8", optional = true }
-actix-http = { version="3.0.0-beta.8", optional = true }
+actix-web = { version="4.0.0-beta.10", optional = true }
+actix-http = { version="3.0.0-beta.11", optional = true }
 
 anyhow = "1.0"
 serde = { version = "1.0", features = ["derive"] }
