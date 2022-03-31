@@ -1,5 +1,4 @@
-use actix_http::body::Body;
-use actix_web::{http::StatusCode, web, ResponseError};
+use actix_web::{body, http::StatusCode, HttpResponse, ResponseError};
 use anyhow::Result;
 use serde::Serialize;
 use serde_json::{json, to_string_pretty};
@@ -23,8 +22,8 @@ impl MsgHttp {
     /// # Errors
     ///
     /// Emit an error in case the body could not be serialized
-    pub fn send_ok() -> Result<web::HttpResponse<Body>> {
-        Ok(web::HttpResponse::Ok()
+    pub fn send_ok() -> Result<HttpResponse<body::BoxBody>> {
+        Ok(HttpResponse::Ok()
             .append_header(("Content-Type", "application/json"))
             .body(serde_json::to_string(&MsgHttp {
                 msg: "OK".to_owned(),
@@ -48,9 +47,9 @@ impl Display for MsgHttp {
 
 impl ResponseError for MsgHttp {
     // builds the actual response to send back when an error occurs
-    fn error_response(&self) -> actix_web::HttpResponse<Body> {
+    fn error_response(&self) -> HttpResponse<body::BoxBody> {
         let err_json = json!({ "error": self.msg });
-        web::HttpResponse::build(
+        HttpResponse::build(
             StatusCode::from_u16(self.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
         )
         .json(err_json)
