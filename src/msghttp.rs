@@ -1,5 +1,4 @@
-use actix_web::http::StatusCode;
-use actix_web::{web, ResponseError};
+use actix_web::{body, http::StatusCode, HttpResponse, ResponseError};
 use anyhow::Result;
 use serde::Serialize;
 use serde_json::{json, to_string_pretty};
@@ -13,28 +12,46 @@ pub struct MsgHttp {
 }
 
 impl MsgHttp {
+    #[must_use]
     pub fn new(msg: String, status: u16) -> MsgHttp {
         MsgHttp { msg, status }
     }
 
-    pub fn send_ok() -> Result<web::HttpResponse> {
-        Ok(web::HttpResponse::Ok().json(MsgHttp {
-            msg: "OK".to_owned(),
-            status: 200,
-        }))
+    /// Builds an `HttpResponse` with OK `StatusCode` and the body provided.
+    ///
+    /// # Errors
+    ///
+    /// Emit an error in case the body could not be serialized
+    pub fn send_ok() -> Result<HttpResponse<body::BoxBody>> {
+        Ok(HttpResponse::Ok()
+            .append_header(("Content-Type", "application/json"))
+            .body(serde_json::to_string(&MsgHttp {
+                msg: "OK".to_owned(),
+                status: 200,
+            })?))
     }
 }
 
 impl Display for MsgHttp {
     fn fmt(&self, f: &mut Formatter) -> FmtResult {
-        write!(f, "{}", to_string_pretty(self).unwrap())
+        write!(
+            f,
+            "{}",
+            match to_string_pretty(self) {
+                Ok(s) => s,
+                Err(_) => "error".to_owned(),
+            }
+        )
     }
 }
 
 impl ResponseError for MsgHttp {
     // builds the actual response to send back when an error occurs
-    fn error_response(&self) -> web::HttpResponse {
+    fn error_response(&self) -> HttpResponse<body::BoxBody> {
         let err_json = json!({ "error": self.msg });
-        web::HttpResponse::build(StatusCode::from_u16(self.status).unwrap()).json(err_json)
+        HttpResponse::build(
+            StatusCode::from_u16(self.status).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
+        )
+        .json(err_json)
     }
 }

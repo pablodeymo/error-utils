@@ -6,8 +6,8 @@ pub struct ErrorMessage {
     pub message: String,
 }
 
-impl ErrorMessage {
-    pub fn from_error(e: anyhow::Error) -> ErrorMessage {
+impl From<anyhow::Error> for ErrorMessage {
+    fn from(e: anyhow::Error) -> ErrorMessage {
         match e.downcast_ref::<String>() {
             Some(msg) => ErrorMessage {
                 message: String::from(msg),
